@@ -1,0 +1,194 @@
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────────────────────────────
+   ClaroFlux Landing — design tokens
+   Two individually-crafted themes driven purely by prefers-color-scheme.
+   No toggle, no JS, no flash: the browser resolves the theme before paint.
+   ──────────────────────────────────────────────────────────────────── */
+
+:root {
+  color-scheme: light;
+
+  /* Light — clean, bright, academic, atmospheric */
+  --canvas:      #F8FAFC;
+  --canvas-deep: #EEF4F9;
+  --card:        #FFFFFF;
+  --ink:         #0B1526;
+  --body:        #44546A;
+  --muted:       #64748B;
+  --line:        #E2E8F0;
+  --line-soft:   #EAF0F6;
+
+  --glass:        rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(15, 23, 42, 0.08);
+
+  --hero-spot-a: rgba(0, 209, 193, 0.22);
+  --hero-spot-b: rgba(21, 96, 174, 0.16);
+  --hero-spot-c: rgba(94, 234, 212, 0.20);
+
+  --shadow-card: 0 1px 2px rgba(11, 21, 38, 0.04), 0 12px 40px -12px rgba(11, 21, 38, 0.12);
+  --shadow-shot: 0 1px 1px rgba(11, 21, 38, 0.05), 0 24px 80px -24px rgba(0, 59, 122, 0.25);
+  --glow-brand:  0 0 0 1px rgba(0, 184, 170, 0.25), 0 8px 40px -8px rgba(0, 184, 170, 0.55);
+
+  --accent:        #009E94; /* accent text on light surfaces (AA) */
+  --accent-strong: #008880;
+  --navy-accent:   #0A4C94;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+
+    /* Dark — cinematic, deep blue-charcoal, glowing accents */
+    --canvas:      #05080D;
+    --canvas-deep: #0A1018;
+    --card:        #0D131B;
+    --ink:         #F1F5F9;
+    --body:        #A8B6C8;
+    --muted:       #8294A8;
+    --line:        #1C2532;
+    --line-soft:   #141C27;
+
+    --glass:        rgba(10, 16, 24, 0.62);
+    --glass-border: rgba(241, 245, 249, 0.08);
+
+    --hero-spot-a: rgba(0, 209, 193, 0.13);
+    --hero-spot-b: rgba(74, 140, 255, 0.10);
+    --hero-spot-c: rgba(0, 136, 128, 0.14);
+
+    --shadow-card: 0 1px 0 rgba(241, 245, 249, 0.03) inset, 0 16px 48px -16px rgba(0, 0, 0, 0.6);
+    --shadow-shot: 0 0 0 1px rgba(241, 245, 249, 0.06), 0 32px 96px -24px rgba(0, 0, 0, 0.75);
+    --glow-brand:  0 0 0 1px rgba(0, 209, 193, 0.35), 0 8px 48px -8px rgba(0, 209, 193, 0.45);
+
+    --accent:        #2BD9C9; /* brightened for contrast on dark */
+    --accent-strong: #5EEAD4;
+    --navy-accent:   #6BA1FF;
+  }
+}
+
+@theme inline {
+  --color-canvas:      var(--canvas);
+  --color-canvas-deep: var(--canvas-deep);
+  --color-card:        var(--card);
+  --color-ink:         var(--ink);
+  --color-body:        var(--body);
+  --color-muted:       var(--muted);
+  --color-line:        var(--line);
+  --color-line-soft:   var(--line-soft);
+  --color-accent:      var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-navy-accent: var(--navy-accent);
+}
+
+@theme {
+  /* ClaroFlux brand — fixed scales (from the product) */
+  --color-brand-50:  #F0FDFB;
+  --color-brand-100: #CCFBF5;
+  --color-brand-200: #99F2E8;
+  --color-brand-300: #5EEAD4;
+  --color-brand-400: #00D1C1;
+  --color-brand-500: #00B8AA;
+  --color-brand-600: #009E94;
+  --color-brand-700: #008880;
+
+  --color-navy-900: #002A57;
+  --color-navy-800: #003B7A;
+  --color-navy-700: #0A4C94;
+  --color-navy-600: #1560AE;
+  --color-navy-400: #4A8CFF;
+  --color-navy-300: #6BA1FF;
+
+  --font-sans: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+
+  --animate-aurora-a: aurora-a 26s ease-in-out infinite alternate;
+  --animate-aurora-b: aurora-b 32s ease-in-out infinite alternate;
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-float-late: float 7s ease-in-out 2.2s infinite;
+  --animate-pulse-dot: pulse-dot 2.4s ease-in-out infinite;
+}
+
+/* ─── Base ─────────────────────────────────────────────────────────── */
+* { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--canvas);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+::selection {
+  background: rgba(0, 209, 193, 0.28);
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ─── Reusable surfaces ────────────────────────────────────────────── */
+.glass {
+  background: var(--glass);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  border: 1px solid var(--glass-border);
+}
+
+.card-shadow { box-shadow: var(--shadow-card); }
+.shot-shadow { box-shadow: var(--shadow-shot); }
+.brand-glow  { box-shadow: var(--glow-brand); }
+
+.text-gradient {
+  background: linear-gradient(100deg, #00D1C1 0%, #00B8AA 45%, #4A8CFF 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Dotted academic grid that fades out radially */
+.bg-grid {
+  background-image: radial-gradient(circle, var(--line) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 35%, black 30%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 35%, black 30%, transparent 75%);
+}
+
+/* ─── Atmosphere keyframes (GPU: transform + opacity only) ─────────── */
+@keyframes aurora-a {
+  0%   { transform: translate3d(-6%, -4%, 0) scale(1)    rotate(0deg); }
+  50%  { transform: translate3d(5%, 5%, 0)   scale(1.15) rotate(8deg); }
+  100% { transform: translate3d(-3%, 6%, 0)  scale(0.95) rotate(-6deg); }
+}
+
+@keyframes aurora-b {
+  0%   { transform: translate3d(4%, 5%, 0)   scale(1.05) rotate(0deg); }
+  50%  { transform: translate3d(-5%, -3%, 0) scale(0.92) rotate(-9deg); }
+  100% { transform: translate3d(6%, -6%, 0)  scale(1.12) rotate(7deg); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1;   transform: scale(1); }
+  50%      { opacity: 0.45; transform: scale(0.82); }
+}
