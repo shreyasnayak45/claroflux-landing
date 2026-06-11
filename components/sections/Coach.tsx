@@ -107,7 +107,7 @@ export function Coach() {
               </div>
 
               {/* Mobile: in-flow above plan (order-first). sm+: absolutely positioned at right edge */}
-              <div className="order-first mb-4 w-full sm:absolute sm:right-0 sm:top-0 sm:z-10 sm:mb-0 sm:w-[42%] lg:-right-14">
+              <div className="order-first mb-4 w-full sm:absolute sm:right-0 sm:top-0 sm:z-10 sm:mb-0 sm:w-[58%] lg:-right-28">
                 {/* Arrow — only visible in the overlapping desktop layout */}
                 <div
                   className="absolute left-0 top-1/2 hidden -translate-x-full -translate-y-1/2 items-center pr-2 sm:flex"
