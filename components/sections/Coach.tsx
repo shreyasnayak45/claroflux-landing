@@ -109,10 +109,11 @@ export function Coach() {
               {/* Form — supporting context, right edge so plan blocks read
                   cleanly on the left; arrow on the form's left edge points
                   into the plan to make input → output causality explicit */}
-              <div className="absolute right-0 top-0 z-10 hidden w-[42%] sm:block lg:-right-14">
-                {/* Arrow at left edge pointing toward plan */}
+              {/* Mobile: in-flow below plan card. sm+: absolutely positioned at right edge */}
+              <div className="mt-4 w-full sm:absolute sm:right-0 sm:top-0 sm:z-10 sm:mt-0 sm:w-[42%] lg:-right-14">
+                {/* Arrow — only visible in the overlapping desktop layout */}
                 <div
-                  className="absolute left-0 top-1/2 flex -translate-x-full -translate-y-1/2 items-center pr-2"
+                  className="absolute left-0 top-1/2 hidden -translate-x-full -translate-y-1/2 items-center pr-2 sm:flex"
                   aria-hidden="true"
                 >
                   <div className="h-px w-5 rounded-full bg-gradient-to-l from-accent/40 to-accent" />
@@ -124,7 +125,7 @@ export function Coach() {
                   <ThemedShot
                     shot={SHOTS.coachForm}
                     alt="The Study Coach intake form: time available, energy level, subject and what's due soon."
-                    sizes="180px"
+                    sizes="(max-width: 640px) 100vw, 180px"
                   />
                 </div>
               </div>
