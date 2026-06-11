@@ -29,7 +29,8 @@ function shot(
 export const SHOTS = {
   dashboard: shot("dashboard", 1917, 907, 1568, 737),
   dashboardDetail: shot("dashboard-detail", 1917, 907, 1568, 741),
-  companionBrief: shot("companion-brief", 561, 786, 567, 793),
+  // cropped to the chat panel itself (no page-background margin)
+  companionBrief: shot("companion-brief", 524, 777, 544, 776),
   companionChat: shot("companion-chat", 557, 790, 581, 802),
   companionAnswer: shot("companion-answer", 522, 267, 547, 245),
   tracker: shot("tracker", 1917, 907, 1568, 737),

@@ -28,11 +28,13 @@ export function Navbar() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-50">
+      {/* Border/radius stay constant (transparent at top) — toggling them
+          with transition-all flashes a white box while border-color falls
+          back to currentColor mid-transition. */}
       <div
         className={cn(
-          "mx-auto flex h-16 max-w-6xl items-center justify-between px-4 transition-all duration-500 sm:px-6",
-          scrolled &&
-            "glass card-shadow mx-3 mt-3 h-14 max-w-5xl rounded-2xl sm:mx-auto",
+          "mx-auto flex h-16 max-w-6xl items-center justify-between rounded-2xl border border-transparent bg-transparent px-4 shadow-none transition-all duration-500 sm:px-6",
+          scrolled && "glass card-shadow mx-3 mt-3 h-14 max-w-5xl sm:mx-auto",
         )}
       >
         <a
