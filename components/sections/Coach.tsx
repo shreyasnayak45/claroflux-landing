@@ -1,5 +1,5 @@
 import {
-  ArrowRight,
+  ArrowLeft,
   BatteryMedium,
   CalendarClock,
   Clock3,
@@ -106,25 +106,26 @@ export function Coach() {
                 />
               </div>
 
-              {/* Form — smaller panel, top-left corner, covers only the plan header
-                  so the five session blocks below remain fully visible */}
-              <div className="absolute left-4 top-4 z-10 hidden w-[32%] sm:block">
+              {/* Form — supporting context, right edge so plan blocks read
+                  cleanly on the left; arrow on the form's left edge points
+                  into the plan to make input → output causality explicit */}
+              <div className="absolute right-4 top-4 z-10 hidden w-[28%] sm:block">
+                {/* Arrow at left edge pointing toward plan */}
+                <div
+                  className="absolute left-0 top-1/2 flex -translate-x-full -translate-y-1/2 items-center pr-2"
+                  aria-hidden="true"
+                >
+                  <div className="h-px w-5 rounded-full bg-gradient-to-l from-accent/40 to-accent" />
+                  <div className="mr-1 flex size-5 shrink-0 items-center justify-center rounded-full bg-brand-500 shadow-[0_0_10px_rgba(0,184,170,0.45)]">
+                    <ArrowLeft className="size-2.5 text-white" />
+                  </div>
+                </div>
                 <div className="card-shadow overflow-hidden rounded-xl border border-line bg-card shadow-xl">
                   <ThemedShot
                     shot={SHOTS.coachForm}
                     alt="The Study Coach intake form: time available, energy level, subject and what's due soon."
-                    sizes="200px"
+                    sizes="180px"
                   />
-                </div>
-                {/* Arrow badge connecting form (input) → plan (output) */}
-                <div
-                  className="absolute right-0 top-1/2 flex -translate-y-1/2 translate-x-full items-center pl-2"
-                  aria-hidden="true"
-                >
-                  <div className="h-px w-5 rounded-full bg-gradient-to-r from-accent/40 to-accent" />
-                  <div className="ml-1 flex size-5 shrink-0 items-center justify-center rounded-full bg-brand-500 shadow-[0_0_10px_rgba(0,184,170,0.45)]">
-                    <ArrowRight className="size-2.5 text-white" />
-                  </div>
                 </div>
               </div>
             </div>
