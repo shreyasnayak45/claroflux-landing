@@ -42,7 +42,7 @@ export function Navbar() {
           className="flex items-center gap-2.5"
           aria-label="ClaroFlux — back to top"
         >
-          <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg bg-white ring-1 ring-line">
+          <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg bg-white ring-1 ring-black/[.10] dark:ring-white/[.08]">
             <Image
               src="/logo.png"
               alt=""

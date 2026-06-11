@@ -39,7 +39,7 @@ export function Footer() {
         <div className="flex flex-col justify-between gap-10 md:flex-row">
           <div className="max-w-xs">
             <a href="#top" className="flex items-center gap-2.5">
-              <div className="flex h-7.5 w-7.5 items-center justify-center overflow-hidden rounded-lg bg-white ring-1 ring-line">
+              <div className="flex h-7.5 w-7.5 items-center justify-center overflow-hidden rounded-lg bg-white ring-1 ring-black/[.10] dark:ring-white/[.08]">
                 <Image src="/logo.png" alt="" width={30} height={30} className="size-7.5 object-contain" />
               </div>
               <span className="text-base font-bold tracking-tight text-ink">
