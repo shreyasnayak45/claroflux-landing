@@ -1,4 +1,5 @@
 import {
+  ArrowRight,
   BatteryMedium,
   CalendarClock,
   Clock3,
@@ -52,7 +53,7 @@ export function Coach() {
         />
 
         {/* Inputs → Plan visual story */}
-        <div className="mt-16 grid items-center gap-12 lg:grid-cols-[5fr_7fr]">
+        <div className="mt-16 grid items-start gap-12 lg:grid-cols-[5fr_7fr]">
           <Reveal delay={0.05}>
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-muted">
               You tell it
@@ -89,7 +90,14 @@ export function Coach() {
               aria-hidden="true"
               className="absolute -inset-8 rounded-[3rem] bg-[radial-gradient(ellipse_60%_60%_at_55%_45%,var(--hero-spot-a),transparent_70%)] blur-2xl"
             />
+
+            {/* Parallel eyebrow: "IT PLANS" mirrors "YOU TELL IT" on the left */}
+            <p className="mb-4 hidden text-sm font-semibold uppercase tracking-[0.18em] text-muted lg:block">
+              It plans
+            </p>
+
             <div className="relative">
+              {/* Plan — dominant, shows all session blocks */}
               <div className="card-shadow overflow-hidden rounded-2xl border border-line bg-card">
                 <ThemedShot
                   shot={SHOTS.plan}
@@ -97,12 +105,27 @@ export function Coach() {
                   sizes="(max-width: 1024px) 100vw, 620px"
                 />
               </div>
-              <div className="card-shadow absolute -bottom-8 -left-4 hidden w-[46%] overflow-hidden rounded-xl border border-line bg-card sm:block lg:-left-10">
-                <ThemedShot
-                  shot={SHOTS.coachForm}
-                  alt="The Study Coach intake form: time available, energy level, subject and what's due soon."
-                  sizes="280px"
-                />
+
+              {/* Form — smaller panel, top-left corner, covers only the plan header
+                  so the five session blocks below remain fully visible */}
+              <div className="absolute left-4 top-4 z-10 hidden w-[32%] sm:block">
+                <div className="card-shadow overflow-hidden rounded-xl border border-line bg-card shadow-xl">
+                  <ThemedShot
+                    shot={SHOTS.coachForm}
+                    alt="The Study Coach intake form: time available, energy level, subject and what's due soon."
+                    sizes="200px"
+                  />
+                </div>
+                {/* Arrow badge connecting form (input) → plan (output) */}
+                <div
+                  className="absolute right-0 top-1/2 flex -translate-y-1/2 translate-x-full items-center pl-2"
+                  aria-hidden="true"
+                >
+                  <div className="h-px w-5 rounded-full bg-gradient-to-r from-accent/40 to-accent" />
+                  <div className="ml-1 flex size-5 shrink-0 items-center justify-center rounded-full bg-brand-500 shadow-[0_0_10px_rgba(0,184,170,0.45)]">
+                    <ArrowRight className="size-2.5 text-white" />
+                  </div>
+                </div>
               </div>
             </div>
           </Reveal>
