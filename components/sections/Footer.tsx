@@ -75,9 +75,6 @@ export function Footer() {
           <p className="text-[13px] text-muted">
             © {new Date().getFullYear()} ClaroFlux. All rights reserved.
           </p>
-          <p className="text-[13px] text-muted">
-            Made for students, by students.
-          </p>
         </div>
       </div>
     </footer>
