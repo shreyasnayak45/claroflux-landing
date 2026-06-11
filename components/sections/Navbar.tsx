@@ -42,14 +42,16 @@ export function Navbar() {
           className="flex items-center gap-2.5"
           aria-label="ClaroFlux — back to top"
         >
-          <Image
-            src="/logo.png"
-            alt=""
-            width={32}
-            height={32}
-            className="size-8"
-            priority
-          />
+          <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg bg-white ring-1 ring-line">
+            <Image
+              src="/logo.png"
+              alt=""
+              width={32}
+              height={32}
+              className="size-8 object-contain"
+              priority
+            />
+          </div>
           <span className="text-[17px] font-bold tracking-tight text-ink">
             ClaroFlux
           </span>

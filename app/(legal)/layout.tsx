@@ -10,7 +10,7 @@ export default function LegalLayout({ children }: { children: React.ReactNode })
         <header className="sticky top-0 z-30 border-b border-line bg-canvas/80 backdrop-blur-xl">
           <div className="mx-auto flex h-14 max-w-3xl items-center justify-between px-4 sm:px-6">
             <a href={SITE_URL} className="flex items-center gap-2.5">
-              <div className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-lg bg-card ring-1 ring-line">
+              <div className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-lg bg-white ring-1 ring-line">
                 <Image src="/logo.png" alt="ClaroFlux" width={28} height={28} className="object-contain" priority />
               </div>
               <span className="text-sm font-semibold text-ink">ClaroFlux</span>
