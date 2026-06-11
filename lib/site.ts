@@ -2,8 +2,8 @@
 export const SITE_URL = "https://claroflux.com";
 export const APP_URL = "https://app.claroflux.com";
 export const SIGNUP_URL = "https://app.claroflux.com/signup";
-export const PRIVACY_URL = "https://app.claroflux.com/privacy";
-export const TERMS_URL = "https://app.claroflux.com/terms";
+export const PRIVACY_URL = "/privacy";
+export const TERMS_URL = "/terms";
 
 export const SITE_NAME = "ClaroFlux";
 export const SITE_TITLE = "ClaroFlux — Make every study hour count";
