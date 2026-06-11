@@ -8,6 +8,7 @@ import {
   SITE_TITLE,
   SITE_URL,
 } from "@/lib/site";
+import { Analytics } from "@vercel/analytics/next";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -85,6 +86,7 @@ export default function RootLayout({
     <html lang="en" className={geist.variable}>
       <body className="font-sans antialiased">
         <Providers>{children}</Providers>
+        <Analytics />
       </body>
     </html>
   );
