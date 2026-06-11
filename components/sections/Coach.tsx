@@ -109,7 +109,7 @@ export function Coach() {
               {/* Form — supporting context, right edge so plan blocks read
                   cleanly on the left; arrow on the form's left edge points
                   into the plan to make input → output causality explicit */}
-              <div className="absolute right-0 top-4 z-10 hidden w-[36%] sm:block lg:-right-8">
+              <div className="absolute right-0 top-0 z-10 hidden w-[42%] sm:block lg:-right-14">
                 {/* Arrow at left edge pointing toward plan */}
                 <div
                   className="absolute left-0 top-1/2 flex -translate-x-full -translate-y-1/2 items-center pr-2"
