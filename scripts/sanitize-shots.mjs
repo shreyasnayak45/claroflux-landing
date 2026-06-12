@@ -45,6 +45,15 @@ const LIGHT = {
     // a zero-gradient boundary instead of sampling that (non-gradient) text.
     patch: { x: 746, y: 120, w: 294, h: 50 },
     edges: { left: "neumann", bottom: "neumann" },
+    // the fill clips the "k" arms — redraw their tapered tips
+    repair: {
+      type: "strokes",
+      color: [255, 255, 255],
+      strokes: [
+        { x0: 742, y0: 141, x1: 753, y1: 132, w0: 5.5, w1: 1.3 }, // upper arm
+        { x0: 742, y0: 150, x1: 754, y1: 159, w0: 5.5, w1: 1.3 }, // lower leg
+      ],
+    },
   },
   hello: {
     // "Hello, Shreyas." → "Hello." (dot drawn after the original word)
@@ -72,6 +81,8 @@ const DARK = {
     // there instead of sampling the glyph.
     patch: { x: 600, y: 88, w: 245, h: 54 },
     edges: { left: "neumann" },
+    // the fill clips the rounded right of the "g" bowl — round it back
+    repair: { type: "cap", color: [245, 245, 248], edgeX: 599, yc: 120, halfH: 12, reach: 3 },
   },
   hello: {
     // "Good morning, Shreyas." → "Good morning."
@@ -136,6 +147,45 @@ async function sanitizeChip(theme, name) {
     : img.png().toBuffer());
   await writeRetry(file, buf);
   console.log(`chip    ${file}`);
+}
+
+/**
+ * The greeting fill reaches right up to the last kept letter, so it clips
+ * that glyph's right edge (the "g" bowl, the "k" arms — they always were
+ * clipped, the old clone started at the same x; the smoother fill just made
+ * it visible). Repaint the missing sliver in glyph colour, blended over the
+ * now-correct gradient: a rounded "cap" for the bowl, short tapered "strokes"
+ * for the arms.
+ */
+function repairGlyph(data, W, C, r) {
+  const idx = (x, y) => (y * W + x) * C;
+  const blend = (x, y, cov) => {
+    const i = idx(x, y);
+    for (let c = 0; c < 3; c++) data[i + c] = Math.round(r.color[c] * cov + data[i + c] * (1 - cov));
+  };
+  if (r.type === "cap") {
+    // semicircular profile: extends farthest at the bowl's vertical centre
+    for (let y = Math.ceil(r.yc - r.halfH); y <= Math.floor(r.yc + r.halfH); y++) {
+      const t = (y - r.yc) / r.halfH;
+      const edge = r.edgeX + r.reach * Math.sqrt(Math.max(0, 1 - t * t));
+      for (let x = r.edgeX + 1; x <= r.edgeX + Math.ceil(r.reach) + 1; x++)
+        blend(x, y, Math.max(0, Math.min(1, edge - x + 0.5)));
+    }
+  } else if (r.type === "strokes") {
+    for (const s of r.strokes) {
+      const n = Math.ceil(Math.hypot(s.x1 - s.x0, s.y1 - s.y0) * 3);
+      for (let t = 0; t <= n; t++) {
+        const f = t / n;
+        const cx = s.x0 + (s.x1 - s.x0) * f, cy = s.y0 + (s.y1 - s.y0) * f;
+        const hw = (s.w0 + (s.w1 - s.w0) * f) / 2, rad = Math.ceil(hw + 1);
+        for (let dy = -rad; dy <= rad; dy++)
+          for (let dx = -rad; dx <= rad; dx++) {
+            const px = Math.round(cx) + dx, py = Math.round(cy) + dy;
+            blend(px, py, Math.max(0, Math.min(1, hw - Math.hypot(px - cx, py - cy) + 0.5)));
+          }
+      }
+    }
+  }
 }
 
 /**
@@ -211,6 +261,8 @@ async function sanitizeGreeting(theme) {
       for (let i = 0; i < rw; i++)
         data[idx(x0 + i, y0 + j) + ch] = Math.max(0, Math.min(255, Math.round(grid[j * rw + i])));
   }
+
+  if (g.repair) repairGlyph(data, W, C, g.repair);
 
   const img = sharp(data, { raw: { width: W, height: info.height, channels: C } });
   const buf = await (theme.ext === ".webp"
