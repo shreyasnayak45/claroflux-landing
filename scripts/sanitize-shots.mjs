@@ -39,10 +39,12 @@ const LIGHT = {
     text: "#0F172A",
   },
   greeting: {
-    // covers ", Shreyas 👋" after "Welcome back"; in-painted by cloning the
-    // clean same-row gradient from just right of the text
+    // covers ", Shreyas 👋" after "Welcome back"; filled with a smooth
+    // (Laplace) surface reconstructed from the surrounding banner gradient.
+    // left edge abuts the "k", bottom edge abuts the subtitle — so both use
+    // a zero-gradient boundary instead of sampling that (non-gradient) text.
     patch: { x: 746, y: 120, w: 294, h: 50 },
-    clone: { x: 1046, y: 120 },
+    edges: { left: "neumann", bottom: "neumann" },
   },
   hello: {
     // "Hello, Shreyas." → "Hello." (dot drawn after the original word)
@@ -64,9 +66,12 @@ const DARK = {
     text: "#F1F5F9",
   },
   greeting: {
-    // covers ", Shreyas 👋" after "Good morning"
+    // covers ", Shreyas 👋" after "Good morning"; filled with a smooth
+    // (Laplace) surface reconstructed from the surrounding banner gradient.
+    // left edge abuts the "g" of "morning" — use a zero-gradient boundary
+    // there instead of sampling the glyph.
     patch: { x: 600, y: 88, w: 245, h: 54 },
-    clone: { x: 850, y: 88 },
+    edges: { left: "neumann" },
   },
   hello: {
     // "Good morning, Shreyas." → "Good morning."
@@ -133,18 +138,81 @@ async function sanitizeChip(theme, name) {
   console.log(`chip    ${file}`);
 }
 
+/**
+ * Erase the name after the greeting by reconstructing the banner gradient
+ * underneath it. The hero banner is a smooth radial-ish gradient with no
+ * texture, so we solve Laplace's equation over the covered rectangle and let
+ * the surrounding clean pixels drive it: the result is the smoothest surface
+ * that meets the real gradient at the edges, leaving no seam (the old
+ * approach cloned a block from further right — a slightly brighter part of
+ * the gradient — which read as a lighter rectangle).
+ *
+ * Edges that abut clean gradient use a fixed (Dirichlet) boundary sampled
+ * just outside the rectangle. Edges that abut the kept greeting text or the
+ * subtitle have no gradient to sample, so they use a zero-gradient (Neumann)
+ * boundary — the fill simply flattens toward them, which matches the gentle
+ * gradient there and never picks up the glyphs.
+ */
 async function sanitizeGreeting(theme) {
   const file = `${theme.dir}/dashboard${theme.ext}`;
   const g = theme.greeting;
-  // clone a clean same-size block of gradient from the same rows, just to
-  // the right of the text — identical vertical gradient, seamless patch
-  const patch = await sharp(file)
-    .extract({ left: g.clone.x, top: g.clone.y, width: g.patch.w, height: g.patch.h })
-    .png()
-    .toBuffer();
-  const img = sharp(file).composite([
-    { input: patch, left: g.patch.x, top: g.patch.y },
-  ]);
+  const edges = g.edges || {};
+  const { data, info } = await sharp(file).raw().toBuffer({ resolveWithObject: true });
+  const W = info.width, C = info.channels;
+  const idx = (x, y) => (y * W + x) * C;
+
+  const x0 = g.patch.x, x1 = g.patch.x + g.patch.w - 1;
+  const y0 = g.patch.y, y1 = g.patch.y + g.patch.h - 1;
+  const rw = x1 - x0 + 1, rh = y1 - y0 + 1;
+
+  // Average a few pixels outward so a Dirichlet boundary is a clean gradient
+  // sample, not a single noisy/compressed pixel.
+  const depth = 3;
+  const out = (x, y, dx, dy, ch) => {
+    let s = 0;
+    for (let k = 1; k <= depth; k++) s += data[idx(x + dx * k, y + dy * k) + ch];
+    return s / depth;
+  };
+
+  for (let ch = 0; ch < 3; ch++) {
+    // Per-edge fixed boundary values (only filled for Dirichlet edges).
+    const top = new Float64Array(rw), bot = new Float64Array(rw);
+    const left = new Float64Array(rh), right = new Float64Array(rh);
+    let seed = 0, seedN = 0;
+    if (edges.top !== "neumann")
+      for (let i = 0; i < rw; i++) { top[i] = out(x0 + i, y0 - 1, 0, -1, ch); seed += top[i]; seedN++; }
+    if (edges.bottom !== "neumann")
+      for (let i = 0; i < rw; i++) { bot[i] = out(x0 + i, y1 + 1, 0, 1, ch); seed += bot[i]; seedN++; }
+    if (edges.left !== "neumann")
+      for (let j = 0; j < rh; j++) { left[j] = out(x0 - 1, y0 + j, -1, 0, ch); seed += left[j]; seedN++; }
+    if (edges.right !== "neumann")
+      for (let j = 0; j < rh; j++) { right[j] = out(x1 + 1, y0 + j, 1, 0, ch); seed += right[j]; seedN++; }
+
+    // Ghost-cell lookup: Neumann edges mirror the interior (zero gradient),
+    // Dirichlet edges return their fixed boundary value.
+    const grid = new Float64Array(rw * rh).fill(seed / seedN);
+    const at = (i, j) =>
+      i < 0 ? (edges.left === "neumann" ? grid[j * rw] : left[j])
+      : i >= rw ? (edges.right === "neumann" ? grid[j * rw + rw - 1] : right[j])
+      : j < 0 ? (edges.top === "neumann" ? grid[i] : top[i])
+      : j >= rh ? (edges.bottom === "neumann" ? grid[(rh - 1) * rw + i] : bot[i])
+      : grid[j * rw + i];
+
+    const omega = 1.9;
+    for (let it = 0; it < 1500; it++)
+      for (let j = 0; j < rh; j++)
+        for (let i = 0; i < rw; i++) {
+          const avg = 0.25 * (at(i - 1, j) + at(i + 1, j) + at(i, j - 1) + at(i, j + 1));
+          const k = j * rw + i;
+          grid[k] += omega * (avg - grid[k]);
+        }
+
+    for (let j = 0; j < rh; j++)
+      for (let i = 0; i < rw; i++)
+        data[idx(x0 + i, y0 + j) + ch] = Math.max(0, Math.min(255, Math.round(grid[j * rw + i])));
+  }
+
+  const img = sharp(data, { raw: { width: W, height: info.height, channels: C } });
   const buf = await (theme.ext === ".webp"
     ? img.webp({ quality: 92 }).toBuffer()
     : img.png().toBuffer());
@@ -169,13 +237,18 @@ async function sanitizeHello(theme) {
   console.log(`hello   ${file}`);
 }
 
-// Steps must run on PRISTINE captures (the greeting clone assumes the
-// original layout). Modes: "light" | "dark" | "redo" (only dashboard +
-// companion-brief, after restoring them from the originals) | default both.
+// The chip/hello steps must run on PRISTINE captures (they redraw over the
+// original layout). The greeting step is now boundary-based, so it is
+// idempotent and safe to re-run on already-sanitized shots. Modes: "light"
+// | "dark" | "greeting" (only the greeting fill, both themes) | "redo"
+// (dashboard + companion-brief, after restoring them) | default both.
 const arg = process.argv[2] ?? "all";
 
 if (arg === "hello-dark") {
   await sanitizeHello(DARK);
+} else if (arg === "greeting") {
+  await sanitizeGreeting(LIGHT);
+  await sanitizeGreeting(DARK);
 } else if (arg === "redo") {
   for (const theme of [LIGHT, DARK]) {
     await sanitizeChip(theme, "dashboard");
